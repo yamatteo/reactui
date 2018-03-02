@@ -1,24 +1,69 @@
 import React, { Component } from 'react'
 import logo from './logo.svg'
-import { mockApi } from './helpers.jsx'
+import { api, whichInsertionFields, whichSelectionFields } from './helpers.jsx'
 import { Button, ButtonGroup, Form, Input, Link, Loader, Navbar, ShowcaseRow, Title } from './basicComponents.jsx'
 
 export function MainNavbar(props) {
   const isSignedin = props.userState && props.userState.isSignedin
-  const isAdmin = props.userState && props.userState.isAdmin
+  const isadmin = props.userState && props.userState.isadmin
   const dispatch = props.dispatch
   const actions = props.actions
   const extraClassName = 'navbar-dark bg-dark'
-  const brand = <Link className="navbar-brand" dispatch={props.dispatch} text="Yamath" action={null} />
+  const brand = (
+    <Link
+      className="navbar-brand"
+      dispatch={props.dispatch}
+      text="Yamath"
+      action={actions.stateUpdate('pageState', { pageName: isSignedin ? 'main' : 'login' })}
+    />
+  )
   const rightAligned = isSignedin ? (
-    <Button className="btn btn-outline-warning" text="logout" dispatch={props.dispatch} action={null} />
+    <Button
+      className="btn btn-outline-warning"
+      text="logout"
+      dispatch={props.dispatch}
+      action={actions.stateUpdate('', { pageState: { pageName: 'login' }, userState: { isSignedin: false } })}
+    />
   ) : (
     undefined
   )
   return (
     <Navbar extraClassName={extraClassName} brand={brand} rightAligned={rightAligned}>
-      {isAdmin && <Link text="Admin" className="nav-item" />}
+      {isadmin && (
+        <Link
+          text="Admin"
+          className="nav-link"
+          dispatch={props.dispatch}
+          action={actions.stateUpdate('pageState', { pageName: 'admin' })}
+        />
+      )}
+      {isadmin && (
+        <Link
+          text="Showcase"
+          className="nav-link"
+          dispatch={props.dispatch}
+          action={actions.stateUpdate('pageState', { pageName: 'showcase' })}
+        />
+      )}
     </Navbar>
+  )
+}
+export function PageAdmin(props) {
+  const dispatch = props.dispatch
+  const actions = props.actions
+  const extraClassName = 'navbar-dark bg-secondary'
+  return (
+    <div>
+      <Navbar extraClassName={extraClassName} {...props}>
+        <Link
+          text="Crud panel"
+          className="nav-link"
+          dispatch={dispatch}
+          action={actions.stateUpdate('pageState.panelName', 'crud')}
+        />
+      </Navbar>
+      <SelectorPanel {...props} />
+    </div>
   )
 }
 export function PageError(props) {
@@ -43,13 +88,17 @@ export function PageLogin(props) {
         <p>Prima di procedere, inserisci nome utente e password:</p>
         <Form
           lambda={() => {
-            mockApi('/api/login', {
-              username: username,
-              fasthash: '0000',
-              isadmin: username === 'admin',
-            }).then(res => {
+            api(
+              '/api/login',
+              {
+                username: username,
+                password: password,
+              },
+              { username: 'mockUser', fasthash: '0', isadmin: false },
+            ).then(res => {
               if (!res.erroneous) {
                 dispatch(actions.stateUpdate('userState', res))
+                dispatch(actions.stateUpdate('userState.isSignedin', true))
                 dispatch(actions.stateUpdate('pageState', { pageName: 'main' }))
               } else {
                 alert('TODO')
@@ -85,27 +134,21 @@ export function PageLogin(props) {
     </div>
   )
 }
-export function PageSelector(props) {
-  const actions = props.actions
-  const dispatch = props.dispatch
-  const pageState = props.pageState || {
-    pageName: 'login',
-  }
-  const pageName = pageState.pageName || 'error'
-  if (pageName === 'login') {
-    return <PageLogin {...props} />
-  }
-  return <PageError {...props} />
-}
 export function PageShowcase(props) {
+  // console.log('Original props', props);
   const dispatch = props.dispatch
   const actions = props.actions
   const state = Object.keys(props).reduce((obj, key) => {
+    // console.log('..reducing', obj, key);
     if (key !== 'dispatch' && key !== 'actions') {
-      obj[key] = props.key
+      // console.log('Insert', key, props[key]);
+      obj[key] = props[key]
+      return obj
+    } else {
       return obj
     }
   }, {})
+  // console.log('PageShowcase state:', Object.keys(props));
   return (
     <div>
       <Title title="Showcase" />{' '}
@@ -118,22 +161,18 @@ export function PageShowcase(props) {
           <h3>Actions</h3>
           <div>
             <p>
-              Reset state to{' '}
+              Set state.a to{' '}
               {JSON.stringify({
-                a: {
-                  b: 0,
-                  c: 0,
-                  d: 0,
-                },
+                b: 0,
+                c: 0,
+                d: 0,
               })}
               <Button
                 dispatch={dispatch}
-                action={actions.stateUpdate('', {
-                  a: {
-                    b: 0,
-                    c: 0,
-                    d: 0,
-                  },
+                action={actions.stateUpdate('a', {
+                  b: 0,
+                  c: 0,
+                  d: 0,
                 })}
               />
             </p>
@@ -168,11 +207,14 @@ export function PageShowcase(props) {
               action={actions.stateUpdate('a.b.x', 19)}
               dispatch={dispatch}
             />
-            <Button
-              className="btn btn-outline-success"
-              text="See app state"
-              lambda={() => alert('App state:' + JSON.stringify(state))}
-            />
+            <p>
+              See app state:
+              <Button
+                className="btn btn-outline-success"
+                text="State"
+                lambda={() => alert('App state:' + JSON.stringify(state))}
+              />
+            </p>
           </div>
           <p>
             With actions you can set path-specific value of the state, but values can be any javascript (at least
@@ -183,9 +225,7 @@ export function PageShowcase(props) {
           <h3>Button</h3>
           <Button />
           <p>
-            Standard
-            <em>Button</em>
-            with no props.
+            Standard <em>Button</em> with no props.
           </p>
         </ShowcaseRow>
         <ShowcaseRow>
@@ -198,9 +238,7 @@ export function PageShowcase(props) {
             }}
           />
           <p>
-            Customizable
-            <em>Button</em>
-            by className, text and lambda function or action (requires dispatch).
+            Customizable <em>Button</em> by className, text and lambda function or action (requires dispatch).
           </p>
         </ShowcaseRow>
         <ShowcaseRow>
@@ -213,9 +251,8 @@ export function PageShowcase(props) {
             }}
           />
           <p>
-            Customizable
-            <em>Button Group</em>
-            by className, values and lambdaGenerator/actionGenerator (requires dispatch)
+            Customizable <em>Button Group</em> by className, values and lambdaGenerator/actionGenerator (requires
+            dispatch)
           </p>
         </ShowcaseRow>
         <ShowcaseRow>
@@ -265,16 +302,15 @@ export function PageShowcase(props) {
           <h3>Link</h3>
           <Link className="text-success" text="Generic link" lambda={() => alert('Link pressed.')} />
           <p>
-            Customizable
-            <em>Link</em>
-            by className, text and lambda/action
+            Customizable <em>Link</em> by className, text and lambda/action
           </p>
         </ShowcaseRow>
         <ShowcaseRow>
           <h3>Loader</h3>
           <Loader
             url="/api"
-            data={{
+            data={{}}
+            mockResponseData={{
               text: 'Some text',
               number: 42,
             }}
@@ -289,7 +325,8 @@ export function PageShowcase(props) {
                 text="Ajax call"
                 action={actions.stateUpdate('mockLoader', {
                   url: '/api',
-                  data: {
+                  data: {},
+                  mockResponseData: {
                     text: 'Some text',
                     number: 42,
                   },
@@ -297,7 +334,13 @@ export function PageShowcase(props) {
                 dispatch={dispatch}
               />
             </p>
-            {<Loader url={state.mockLoader && state.mockLoader.url} data={state.mockLoader && state.mockLoader.data} />}
+            {
+              <Loader
+                mockResponseData={state.mockLoader && state.mockLoader.mockResponseData}
+                url={state.mockLoader && state.mockLoader.url}
+                data={state.mockLoader && state.mockLoader.data}
+              />
+            }
           </div>
           <p>
             Loaders are containers that, when mounted and provided with an url and some data, will fetch and load some
@@ -325,6 +368,83 @@ export function PageShowcase(props) {
           </div>
         </ShowcaseRow>
       </div>
+    </div>
+  )
+}
+
+export function PanelCrud(props) {
+  const actions = props.actions
+  const dispatch = props.dispatch
+  const crudPanel = props.pageState && props.pageState.crudPanel
+  const model = crudPanel && crudPanel.model
+  const method = crudPanel && crudPanel.method
+  const selectionFields = (method === 'Read' || method === 'Update' || method === 'Delete') && ((crudPanel && crudPanel.selectionFields) || whichSelectionFields(model))
+  const insertionFields = (method === 'Create' || method === 'Update') && ((crudPanel && crudPanel.insertionFields) || whichInsertionFields(model))
+  return (
+    <div className="container">
+      <p> </p>
+      <Form
+        lambda={() => {
+          return null
+        }}
+      >
+        <p>Seleziona modello e metodo:</p>
+        <div className="form-group">
+          <ButtonGroup
+            className="btn btn-primary"
+            values="User Node Question"
+            selectedValue={model}
+            actionGenerator={value => actions.stateUpdate('pageState.crudPanel.model', value)}
+            dispatch={dispatch}
+          />
+        </div>
+        <div className="form-group">
+          <ButtonGroup
+            className="btn btn-primary"
+            values="Create Read Update Delete"
+            selectedValue={method}
+            actionGenerator={value => actions.stateUpdate('pageState.crudPanel.method', value)}
+            dispatch={dispatch}
+          />
+        </div>
+        <div className='form-group'>
+          <p>Selection Arguments</p>
+          { JSON.stringify(selectionFields) }
+        </div>
+        <div className='form-group'>
+          <p>Insertion Arguments</p>
+          { JSON.stringify(insertionFields) }
+        </div>
+        <Input name="submit" className="btn btn-primary" type="submit" value="Invia" />
+      </Form>
+    </div>
+  )
+}
+
+export function SelectorPage(props) {
+  const actions = props.actions
+  const dispatch = props.dispatch
+  const isSignedin = props.userState && props.userState.isSignedin
+  const pageName = isSignedin ? props.pageState && props.pageState.pageName : 'login'
+  if (pageName === 'admin') {
+    return <PageAdmin {...props} />
+  }
+  if (pageName === 'login') {
+    return <PageLogin {...props} />
+  }
+  if (pageName === 'showcase') {
+    return <PageShowcase {...props} />
+  }
+  return <PageError {...props} />
+}
+export function SelectorPanel(props) {
+  const panelName = props.pageState.panelName
+  if (panelName === 'crud') {
+    return <PanelCrud {...props} />
+  }
+  return (
+    <div>
+      <h2>Chose a panel</h2>
     </div>
   )
 }

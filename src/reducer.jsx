@@ -2,9 +2,9 @@ const reducers = {
   STATE_UPDATE: (prev, action) => {
     const array = action.path.split('.')
     const value = action.value
-    // console.log("State update", prev, array, value)
+   // console.log("State update", prev, array, value)
     const replaceArrayValue = function (obj, array, value) {
-      // console.log('Rav', obj, array, value);
+     // console.log('Rav', obj, array, value);
       if (!((obj instanceof Object) || (obj instanceof Array) || obj === undefined)) {
         throw "Setting value to a non-object element of the state."
       }
@@ -18,7 +18,12 @@ const reducers = {
       const key = array[0];
       if (array.length === 1) {
         if (key === '') {
-          next = value
+          next = Object.keys(next).reduce((_next, key) => {
+            _next[key] = undefined;
+            return _next
+          }, next)
+          next = Object.assign(next, value)
+
         } else {
           next[key] = value
         }
@@ -26,6 +31,7 @@ const reducers = {
         const internalPrev = next[key];
         next[key] = replaceArrayValue(internalPrev, array.slice(1), value);
       }
+     // console.log('Rav will return ', next);
       return next
     }
     return replaceArrayValue(prev, array, value)

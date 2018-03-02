@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import logo from './logo.svg';
-import { mockApi } from './helpers.jsx'
+import { api } from './helpers.jsx'
 
 export function Button(props) {
   const className = props.className !== undefined
@@ -137,24 +137,25 @@ export class Loader extends Component {
     this.state = {
       url: props.url,
       data: props.data,
+      mockResponseData: props.mockResponseData,
       loaded: false,
       result: undefined
     },
-    this.trigger = ((url, data) => {
-      console.log(this, 'triggered');
-      mockApi(url, data).then(json => this.setState({loaded: true, result: json, reload: false}))
-      // mockApi(url, data).then(json => {this.setState(((prevState, props) => { return {loaded: true, result: json, reload: false} }));})
-      // mockApi(url, data).then((json => {console.log('this', this.setState)}).bind(this))
+    this.trigger = ((url, data, mockResponseData) => {
+      // console.log(this, 'triggered');
+      api(url, data, mockResponseData).then(json => this.setState({loaded: true, result: json, reload: false}))
+      // api(url, data).then(json => {this.setState(((prevState, props) => { return {loaded: true, result: json, reload: false} }));})
+      // api(url, data).then((json => {console.log('this', this.setState)}).bind(this))
     }).bind(this)
   }
   componentWillReceiveProps(nextProps) {
     if (nextProps.url && nextProps.data) {
-      this.trigger(nextProps.url, nextProps.data)
+      this.trigger(nextProps.url, nextProps.data, nextProps.mockResponseData)
     }
   }
   componentDidMount() {
-    if (this.state.url && this.state.data) {
-      this.trigger(this.state.url, this.state.data)
+    if (this.props.url && this.props.data) {
+      this.trigger(this.props.url, this.props.data, this.props.mockResponseData)
     }
   }
   render() {

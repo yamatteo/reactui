@@ -4,14 +4,23 @@ import './App.css'
 import * as actions from './actions.jsx'
 import * as helpers from './helpers.jsx'
 import { reduce } from './reducer.jsx'
-import { Button, ButtonGroup, Form, Input, Link, Loader, Navbar, ShowcaseRow } from './basicComponents.jsx'
-import { MainNavbar, PageSelector } from './complexComponents.jsx'
+// import { Button, ButtonGroup, Form, Input, Link, Loader, Navbar, ShowcaseRow } from './basicComponents.jsx'
+import { MainNavbar, SelectorPage } from './complexComponents.jsx'
 
 class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      pageState: { pageName: 'login' },
+      pageState: {
+        pageName: 'admin',
+        panelName: 'crud',
+      },
+      userState: {
+        username: 'admin',
+        fasthash: '0',
+        isSignedin: true,
+        isadmin: true,
+      }
     }
     this.dispatch = (() => {
       return function(action) {
@@ -39,7 +48,7 @@ class App extends Component {
     return (
       <div className="App">
         <MainNavbar {...downflow} />
-        <PageSelector {...downflow} />
+        <SelectorPage {...downflow} />
       </div>
     )
   }
