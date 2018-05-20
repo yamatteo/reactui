@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { UnderVisible, Link, Navbar } from './generic_components.jsx'
+import { OverVisible, UnderVisible, Link, Navbar, NavbarMr, NavbarMl } from './generic_components.jsx'
 import { PageSelector } from './pages/selector.jsx'
 import logo from './logo.svg'
 import './App.css'
@@ -56,49 +56,21 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Navbar
-          className="navbar navbar-expand navbar-dark bg-dark"
-          // className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"
-          brand={ (() => {
-            if (this.state.user_state && this.state.user_state.username) {
-              return (
-                <Link
-                className="navbar-brand"
-                lambda={() => this.set(['page_state'], { page_name: 'main' })}
-                text={this.state.experimental ? 'Xper' : 'Yamath'}
-              />
-            )
-            } else {
-              return (
-                <Link
-                className="navbar-brand"
-                lambda={() => this.set(['page_state'], { page_name: 'welcome' })}
-                text={this.state.experimental ? 'Xper' : 'Yamath'}
-              />
-            )
+        <Navbar className="navbar navbar-expand navbar-dark bg-dark">
+          <Link
+            className="navbar-brand"
+            lambda={() =>
+              this.set(['page_state'], {
+                page_name: this.state.user_state && this.state.user_state.username ? 'main' : 'welcome',
+              })
             }
-          })()
-          }
-          rightAligned={ (() => {
-            if (this.state.user_state && this.state.user_state.username) {
-              return [
-                <Link className='nav-link' lambda={()=> this.set(['page_state'], {page_name: 'login'})(['user_state'], {})}><span className='oi oi-account-logout'/></Link>,
-              ]
-            } else {
-              return [
-                <Link className='nav-link' lambda={()=> this.set(['page_state'], {page_name: 'login'})}><span className='oi oi-account-login'/></Link>,
-              ]
-            }
-          })() }
-        >
-
-          {/* {this.state.experimental && (
-            <Link
-              className="nav-link"
-              lambda={() => this.setState({ page_name: 'question', questionId: '5ab13d73ce616410a749cd06' })}
-              text="question"
-            />
-          )} */}
+            text={this.state.experimental ? 'Xper' : 'Yamath'}
+          />
+          <NavbarMl>
+            <Link key='login' className='nav-link' lambda={()=> this.set(['page_state'], {page_name: 'login'})(['user_state'], {})}>
+              <OverVisible type='inline'>{ (this.state.user_state && this.state.user_state.username) ? 'Logout ' : 'Login ' } </OverVisible> <span className={ (this.state.user_state && this.state.user_state.username) ? 'oi oi-account-logout' : 'oi oi-account-login' }/>
+            </Link>
+          </NavbarMl>
         </Navbar>
         <UnderVisible>Text</UnderVisible>
         <PageSelector app={this} />

@@ -76,6 +76,39 @@ export function OverVisible(props) {
     </div>
   )
 }
+export function NavbarMr(props) {
+  const links = props.children instanceof Array ? props.children : [props.children]
+  return (
+     <ul className="navbar-nav mr-auto">{links.map(link => <li className="nav-item" key={link.key}>{link}</li>)}</ul>
+ )
+}
+export function NavbarMl(props) {
+  const links = props.children instanceof Array ? props.children : [props.children]
+  return (
+      <ul className="navbar-nav ml-auto">{links.map(link => <li className="nav-item" key={link.key}>{link}</li>)}</ul>
+  )
+}
+export function Navbar(props) {
+  const className = (() => {
+    if (props.className) {
+      return props.className
+    }
+    let name = 'navbar navbar-expand'
+    if (props.extraClassName !== undefined) {
+      name += ' '
+      name += props.extraClassName
+    }
+    return name
+  })()
+  const children = props.children
+  return (
+    <nav className={className}>
+      <div className="container">
+        { children }
+      </div>
+    </nav>
+  )
+}
 
 export function AutoForm(props) {
   const app = props.app
@@ -257,50 +290,6 @@ export function Input(props) {
   })()
   return (
     <input className={className} name={name} type={type} value={value} placeholder={placeholder} onChange={onChange} />
-  )
-}
-export function Navbar(props) {
-  const className = (() => {
-    if (props.className) {
-      return props.className
-    }
-    let name = 'navbar navbar-expand'
-    if (props.extraClassName !== undefined) {
-      name += ' '
-      name += props.extraClassName
-    }
-    return name
-  })()
-  const children = props.children instanceof Array ? props.children : [props.children]
-  const brand = props.brand
-  const links = children
-  const rightAligned = props.rightAligned instanceof Array ? props.rightAligned : [props.rightAligned]
-  // const buttons = children.filter(child => child.type.name === "Button");
-  // console.log("className", className);
-  // console.log("Navbar children", props.children);
-  return (
-    <nav className={className}>
-      <div className="container">
-        {brand}
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarResponsive"
-          aria-controls="navbarResponsive"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon" />
-        </button>
-        <div className="collapse navbar-collapse">
-          <ul className="navbar-nav mr-auto">{links.map(link => <li className="nav-item">{link}</li>)}</ul>
-        </div>
-        <div className="collapse navbar-collapse">
-          <ul className="navbar-nav ml-auto">{rightAligned.map(link => <li className="nav-item">{link}</li>)}</ul>
-        </div>
-      </div>
-    </nav>
   )
 }
 export function Title(props) {
