@@ -1,5 +1,81 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { api } from './fetch.jsx'
+
+export function Link(props) {
+  const className = (props.className || '') + ' ' + (props.extraClassName || '')
+  const text = (() => {
+    if (props.children) {
+      return props.children
+    } else if (props.text) {
+      return props.text
+    } else {
+      return 'link (missing text)'
+    }
+  })()
+  const onClick = (() => {
+    if (props.lambda) {
+      return props.lambda
+    } else {
+      return () => alert('Link was clicked (no action)')
+    }
+  })()
+  return (
+    <a
+      className={className}
+      href="/"
+      onClick={event => {
+        event.preventDefault()
+        onClick()
+      }}
+    >
+      {text}
+    </a>
+  )
+}
+export function UnderVisible(props) {
+  const breakpoint = (() => {
+    if (props.breakpoint) {
+      return props.breakpoint
+    } else {
+      return "sm"
+    }
+  })();
+  const type = (() => {
+    if (props.type) {
+      return props.type
+    } else {
+      return "block"
+    }
+  })();
+  const children = props.children
+  return (
+    <div className={`d-${type} d-${breakpoint}-none`}>
+      { children }
+    </div>
+  )
+}
+export function OverVisible(props) {
+  const breakpoint = (() => {
+    if (props.breakpoint) {
+      return props.breakpoint
+    } else {
+      return "sm"
+    }
+  })();
+  const type = (() => {
+    if (props.type) {
+      return props.type
+    } else {
+      return "block"
+    }
+  })();
+  const children = props.children
+  return (
+    <div className={`d-none d-${breakpoint}-${type}`}>
+      { children }
+    </div>
+  )
+}
 
 export function AutoForm(props) {
   const app = props.app
@@ -50,7 +126,6 @@ export function AutoForm(props) {
     </Form>
   )
 }
-
 export function Button(props) {
   const className = props.className !== undefined ? props.className : 'btn btn-primary'
   const text = (() => {
@@ -184,38 +259,6 @@ export function Input(props) {
     <input className={className} name={name} type={type} value={value} placeholder={placeholder} onChange={onChange} />
   )
 }
-export function Link(props) {
-  const className = props.className
-  const text = (() => {
-    if (props.children) {
-      return props.children
-    } else if (props.text) {
-      return props.text
-    } else {
-      return 'link (missing text)'
-    }
-  })()
-  const onClick = (() => {
-    if (props.lambda) {
-      return props.lambda
-    } else {
-      return () => alert('Link was clicked (no action)')
-    }
-  })()
-  return (
-    <a
-      className={className}
-      href="/"
-      onClick={event => {
-        event.preventDefault()
-        onClick()
-      }}
-    >
-      {text}
-    </a>
-  )
-}
-
 export function Navbar(props) {
   const className = (() => {
     if (props.className) {

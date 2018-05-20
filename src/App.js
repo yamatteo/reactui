@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Link, Navbar } from './generic_components.jsx'
+import { UnderVisible, Link, Navbar } from './generic_components.jsx'
 import { PageSelector } from './pages/selector.jsx'
 import logo from './logo.svg'
 import './App.css'
@@ -100,6 +100,7 @@ class App extends Component {
             />
           )} */}
         </Navbar>
+        <UnderVisible>Text</UnderVisible>
         <PageSelector app={this} />
       </div>
     )
