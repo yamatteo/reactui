@@ -84,13 +84,13 @@ export function Link(props) {
 export function NavbarMr(props) {
   const links = props.children instanceof Array ? props.children : [props.children]
   return (
-     <ul className="navbar-nav mr-auto">{links.map(link => <li className="nav-item" key={link.key}>{link}</li>)}</ul>
+     <ul className="navbar-nav mr-auto">{links.map(link => <li className="nav-item">{link}</li>)}</ul>
  )
 }
 export function NavbarMl(props) {
   const links = props.children instanceof Array ? props.children : [props.children]
   return (
-      <ul className="navbar-nav ml-auto">{links.map(link => <li className="nav-item" key={link.key}>{link}</li>)}</ul>
+      <ul className="navbar-nav ml-auto">{links.map(link => <li className="nav-item">{link}</li>)}</ul>
   )
 }
 export function Navbar(props) {

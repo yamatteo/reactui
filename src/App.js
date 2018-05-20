@@ -67,8 +67,27 @@ class App extends Component {
             text={this.state.experimental ? 'Xper' : 'Yamath'}
           />
           <NavbarMl>
-            <Link key='login' className='nav-link' lambda={()=> this.set(['page_state'], {page_name: 'login'})(['user_state'], {})}>
-              <OverVisible type='inline'>{ (this.state.user_state && this.state.user_state.username) ? 'Logout ' : 'Login ' } </OverVisible> <span className={ (this.state.user_state && this.state.user_state.username) ? 'oi oi-account-logout' : 'oi oi-account-login' }/>
+            { this.state.user_state && this.state.user_state.username && (
+              <Link key="message" className="nav-link" lambda={() => this.set(['page_state'], { page_name: 'message' })}>
+                <OverVisible type="inline">Messaggi</OverVisible>
+                <span className="oi oi-mail" />
+              </Link>
+            )}
+            <Link
+              key="login"
+              className="nav-link"
+              lambda={() => this.set(['page_state'], { page_name: 'login' })(['user_state'], {})}
+            >
+              <OverVisible type="inline">
+                {this.state.user_state && this.state.user_state.username ? 'Logout ' : 'Login '}{' '}
+              </OverVisible>{' '}
+              <span
+                className={
+                  this.state.user_state && this.state.user_state.username
+                    ? 'oi oi-account-logout'
+                    : 'oi oi-account-login'
+                }
+              />
             </Link>
           </NavbarMl>
         </Navbar>
