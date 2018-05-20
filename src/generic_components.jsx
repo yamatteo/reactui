@@ -1,6 +1,55 @@
 import React from 'react'
 import { api } from './fetch.jsx'
 
+export function AutoForm(props) {
+  const app = props.app
+  const endpoint = props.endpoint
+  const lambda = props.lambda
+
+  const values = {}
+  Object.keys(props.inputs).forEach(key => {
+    try {
+      values[key] = app.state.page_state.form[key]
+    } catch (e) {
+      values[key] = undefined
+    }
+  })
+
+  const inputs_info = []
+  Object.keys(props.inputs).forEach(key => {
+    const elem = props.inputs[key]
+    inputs_info.push({
+      key: key,
+      label: elem.label,
+      name: elem.name || key,
+      className: elem.className || 'form-control',
+      type: elem.type || 'text',
+      value: elem.value || values[key],
+      lambda: elem.lambda || (event => app.set(['page_state', 'form', key], event.target.value)),
+    })
+  })
+
+  return (
+    <Form
+      lambda={() => {
+        api(endpoint, values).then(res => {
+          if (res.erroneous) {
+            alert("C'è stato un errore")
+          } else {
+            lambda(res)
+          }
+        })
+      }}
+    >
+      {inputs_info.map(info => (
+        <div className="form-group" key={info.key}>
+          {info.label && <label>{info.label}</label>}
+          <Input name={info.name} className={info.className} type={info.type} value={info.value} lambda={info.lambda} />
+        </div>
+      ))}
+    </Form>
+  )
+}
 export function Link(props) {
   const className = (props.className || '') + ' ' + (props.extraClassName || '')
   const text = (() => {
@@ -30,50 +79,6 @@ export function Link(props) {
     >
       {text}
     </a>
-  )
-}
-export function UnderVisible(props) {
-  const breakpoint = (() => {
-    if (props.breakpoint) {
-      return props.breakpoint
-    } else {
-      return "sm"
-    }
-  })();
-  const type = (() => {
-    if (props.type) {
-      return props.type
-    } else {
-      return "block"
-    }
-  })();
-  const children = props.children
-  return (
-    <div className={`d-${type} d-${breakpoint}-none`}>
-      { children }
-    </div>
-  )
-}
-export function OverVisible(props) {
-  const breakpoint = (() => {
-    if (props.breakpoint) {
-      return props.breakpoint
-    } else {
-      return "sm"
-    }
-  })();
-  const type = (() => {
-    if (props.type) {
-      return props.type
-    } else {
-      return "block"
-    }
-  })();
-  const children = props.children
-  return (
-    <div className={`d-none d-${breakpoint}-${type}`}>
-      { children }
-    </div>
   )
 }
 export function NavbarMr(props) {
@@ -109,56 +114,51 @@ export function Navbar(props) {
     </nav>
   )
 }
-
-export function AutoForm(props) {
-  const app = props.app
-  const endpoint = props.endpoint
-  const lambda = props.lambda
-
-  const values = {}
-  Object.keys(props.inputs).forEach(key => {
-    try {
-      values[key] = app.state.page_state.form[key]
-    } catch (e) {
-      values[key] = undefined
+export function OverVisible(props) {
+  const breakpoint = (() => {
+    if (props.breakpoint) {
+      return props.breakpoint
+    } else {
+      return "sm"
     }
-  })
-
-  const inputs_info = []
-  Object.keys(props.inputs).forEach(key => {
-    const elem = props.inputs[key]
-    inputs_info.push({
-      key: key,
-      label: elem.label,
-      name: elem.name || key,
-      className: elem.className || 'form-control',
-      type: elem.type || 'text',
-      value: elem.value || values[key],
-      lambda: elem.lambda || (event => app.set(['page_state', 'form', key], event.target.value)),
-    })
-  })
-
+  })();
+  const type = (() => {
+    if (props.type) {
+      return props.type
+    } else {
+      return "block"
+    }
+  })();
+  const children = props.children
   return (
-    <Form
-      lambda={() => {
-        api(endpoint, values).then(res => {
-          if (!res.erroneous) {
-            lambda(res)
-          } else {
-            alert("C'è stato un errore")
-          }
-        })
-      }}
-    >
-      {inputs_info.map(info => (
-        <div className="form-group" key={info.key}>
-          {info.label && <label>{info.label}</label>}
-          <Input name={info.name} className={info.className} type={info.type} value={info.value} lambda={info.lambda} />
-        </div>
-      ))}
-    </Form>
+    <div className={`d-none d-${breakpoint}-${type}`}>
+      { children }
+    </div>
   )
 }
+export function UnderVisible(props) {
+  const breakpoint = (() => {
+    if (props.breakpoint) {
+      return props.breakpoint
+    } else {
+      return "sm"
+    }
+  })();
+  const type = (() => {
+    if (props.type) {
+      return props.type
+    } else {
+      return "block"
+    }
+  })();
+  const children = props.children
+  return (
+    <div className={`d-${type} d-${breakpoint}-none`}>
+      { children }
+    </div>
+  )
+}
+
 export function Button(props) {
   const className = props.className !== undefined ? props.className : 'btn btn-primary'
   const text = (() => {

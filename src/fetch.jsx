@@ -8,12 +8,14 @@ export function api(url, data) {
   return fetch("http://0.0.0.0:8000"+url, { method: "POST", body: JSON.stringify(data) })
   .then(async res => {
     // return res.json()
-    if (199 < res.status && res.status < 200) {
+    console.log("status", res.status)
+    if (199 < res.status && res.status < 300) {
       return Object.assign({}, await res.json())
     } else if (399 < res.status && res.status < 500) {
+      const json_response = await res.json()
       return Object.assign({
         erroneous: true
-      }, await res.json())
+      }, json_response)
     } else {
       await timeout(1000)
       const text = await res.text()

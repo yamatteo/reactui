@@ -17,7 +17,7 @@ export function LoginPage(props) {
             <p>Prima di procedere, inserisci nome utente e password:</p>
             <AutoForm
               app={app}
-              endpoint="/api/login"
+              endpoint="/login"
               inputs={{
                 username: { label: 'Username' },
                 password: { label: 'Password', type: 'password' },

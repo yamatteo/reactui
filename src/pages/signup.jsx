@@ -19,7 +19,7 @@ export function SignupPage(props) {
             <p>L'indirizzo mail verrà utilizzato esclusivamente per inviare una mail con la password di accesso in caso di smarrimento.</p>
             <AutoForm
               app={app}
-              endpoint="/api/signup"
+              endpoint="/signup"
               inputs={{
                 username: { label: 'Username' },
                 email: { label: 'Indirizzo email' },
